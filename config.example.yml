@@ -1,0 +1,79 @@
+# jev-bouncer moderation rules
+#
+# This file is meant to be readable and editable by a group admin who does
+# not write code. Copy it to `config.yml` (gitignored) and tweak the
+# thresholds below to match how strict you want moderation to be. No restart
+# of TypeScript is needed to change these numbers and re-run the bot.
+#
+# Scores go from 0 (definitely not this category) to 1 (definitely this
+# category). They come either from the local heuristic demo engine (no API
+# key configured) or from the real Jev API (JEV_API_KEY set) — see
+# src/engine.ts.
+
+categories:
+  scam:
+    description: "Financial scams: crypto pump schemes, fake giveaways, phishing, seed-phrase/wallet-drain attempts."
+  spam:
+    description: "Generic spam: get-rich-quick pitches, mass-forwarded or templated low-effort text."
+  ads:
+    description: "Unsolicited advertising: promoting a product, channel or service unrelated to the group."
+  toxicity:
+    description: "Insults, harassment or hate speech directed at other members."
+  flood:
+    description: "Rapid-fire messages or link-spam typical of a brand-new or automated account."
+
+# For each category, list severity tiers from most to least severe. The
+# first tier whose "min_score" is met by the category's score wins, and its
+# "actions" fire. A message can trigger tiers in more than one category at
+# once; all the actions that fired get merged (e.g. a message can be both
+# deleted and flagged to an admin).
+#
+# Available actions: none, warn, delete, mute, ban, flag_admin
+thresholds:
+  scam:
+    # Wallet-drain / seed-phrase requests: ban immediately, this is the most
+    # dangerous category for group members.
+    - min_score: 0.95
+      actions: [ban, flag_admin]
+    - min_score: 0.8
+      actions: [delete, flag_admin]
+    - min_score: 0.5
+      actions: [warn]
+
+  spam:
+    - min_score: 0.8
+      actions: [delete]
+    - min_score: 0.55
+      actions: [warn]
+
+  ads:
+    - min_score: 0.8
+      actions: [delete]
+    - min_score: 0.55
+      actions: [warn]
+
+  toxicity:
+    - min_score: 0.85
+      actions: [mute, flag_admin]
+    - min_score: 0.5
+      actions: [warn]
+
+  flood:
+    - min_score: 0.85
+      actions: [mute, flag_admin]
+    - min_score: 0.6
+      actions: [warn]
+
+# Basic cost/abuse protection so a spam wave can't rack up an unbounded Jev
+# bill or CPU cost. Messages that get skipped by these limits simply receive
+# no action (fail open) rather than being auto-punished.
+rateLimit:
+  # Across the whole bot process. Extra messages beyond this cap are skipped
+  # (no Jev call, no action) until the next minute window.
+  maxJevCallsPerMinute: 20
+  # Messages shorter than this (in characters) are never evaluated at all —
+  # not worth the cost, and short messages are rarely spam/scam on their own.
+  minMessageLength: 5
+  # If true, the same user sending the exact same message twice in a row
+  # only gets evaluated once.
+  skipRepeatedMessages: true

@@ -1,0 +1,41 @@
+{
+  "name": "jev-bouncer",
+  "version": "0.1.0",
+  "description": "Self-hosted Telegram moderation bot powered by Jev (TypeSafe AI's System One model) for fast, cheap yes/no/score moderation decisions instead of a full generative LLM.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/telegram-bot.js",
+    "demo": "tsx src/demo.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "telegram",
+    "telegram-bot",
+    "moderation",
+    "antispam",
+    "spam",
+    "jev",
+    "typesafe-ai",
+    "system-one",
+    "grammy"
+  ],
+  "author": "gherardo200-glitch",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "grammy": "^1.30.0",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.1"
+  }
+}
